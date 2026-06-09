@@ -33,8 +33,6 @@ export const AddListDrawer = ({ isOpen, onClose }: AddListDrawerProps) => {
     const response = await creationPromise
 
     if (response) {
-      response.items = []
-      addList(response)
       onClose()
     } else {
       // Handle error (e.g., show a notification)
