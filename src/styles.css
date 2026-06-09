@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #8b1a2f;
+  --color-secondary: #a8253e;
+  --color-tertiary: #c44060;
+  --color-highlight: #3d0e1e;
+  --color-muted: #5a0a16;
+  --color-surface: #1e0710;
+  --color-accent: #d4a82a;
+  --color-content: #fef0f4;
+  --color-background: #120208;
+  --color-text: #f0d5dc;
+  --color-border: #4d0f20;
+  --color-destructive: #b80012;
+  --color-card: #2a0b1c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+@layer base {
+  input {
+    background-color: var(--color-surface);
+    color: var(--color-content);
+    border: 1px solid var(--color-muted);
+    padding: 8px;
+    border-radius: var(--radius-md);
+  }
+
+  textarea {
+    background-color: var(--color-surface);
+    color: var(--color-content);
+    border: 1px solid var(--color-muted);
+    padding: 8px;
+    border-radius: var(--radius-md);
+  }
+
+  button {
+    background-color: var(--color-primary);
+    color: var(--color-content);
+    border: none;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    scale: 1;
+  }
+
+  button:disabled {
+    background-color: var(--color-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  button:hover:not(:disabled) {
+    background-color: var(--color-secondary);
+  }
+
+  button:active:not(:disabled) {
+    background-color: var(--color-tertiary);
+    scale: 0.98;
+  }
+}
+
+@theme {
+  --animate-slide-up: slide-up 0.3s ease-out;
+  --animate-scale-in: scale-in 0.2s ease-out;
+
+  @keyframes slide-up {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes scale-in {
+    0% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}

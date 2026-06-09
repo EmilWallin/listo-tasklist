@@ -1,0 +1,179 @@
+import type { ListEntryDTO } from '#/types/ListEntry'
+import { useEffect, useState } from 'react'
+import BottomSheetModal from '../ModalBase/BottomSheetModal'
+import { createListEntry } from '#/api/listEntries'
+import { toast } from 'react-toastify'
+import { useLists } from '#/stores/ListsStore'
+import { generateKeyBetween } from 'jittered-fractional-indexing'
+import { ComboBox } from '../ComboBox/ComboBox'
+import { getSuggestions } from '#/api/suggestions'
+import type { Suggestion } from '#/types/Suggestion'
+
+interface AddListItemDrawerProps {
+  parentId: number
+  isOpen: boolean
+  onClose: () => void
+}
+
+export const AddListItemDrawer = ({
+  parentId,
+  isOpen,
+  onClose,
+}: AddListItemDrawerProps) => {
+  const [itemName, setItemName] = useState('')
+  const [comboValue, setComboValue] = useState<string | undefined>(undefined)
+  const [itemDescription, setItemDescription] = useState('')
+  const [itemQuantity, setItemQuantity] = useState<number | undefined>(
+    undefined,
+  )
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+
+  useEffect(() => {
+    if (!isOpen) {
+      setItemName('')
+      setComboValue(undefined)
+      setItemDescription('')
+      setItemQuantity(undefined)
+      setSuggestions([])
+    }
+  }, [isOpen])
+
+  const { addListEntry, lists } = useLists()
+  const currentList = lists.find((l) => l.id === parentId)
+  const lastPosition =
+    [...(currentList?.items ?? [])]
+      .sort((a, b) => {
+        if (a.position === null) return 1
+        if (b.position === null) return -1
+        return a.position < b.position ? -1 : 1
+      })
+      .at(-1)?.position ?? null
+
+  const handleItemDescriptionChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setItemDescription(e.target.value)
+  }
+
+  const handleItemQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+
+    if (!value || Number(value) < 0 || isNaN(Number(value))) return
+
+    setItemQuantity(Number(value))
+  }
+
+  const handleCreate = async (e: React.SubmitEvent) => {
+    e.preventDefault()
+
+    if (
+      currentList?.items.some(
+        (item) => item.itemName.toLowerCase() === itemName.trim().toLowerCase(),
+      )
+    ) {
+      toast.error('This item is already in the list.')
+      return
+    }
+
+    const newEntry = {
+      parent_id: parentId,
+      item_name: itemName,
+      item_description: itemDescription,
+      item_quantity: itemQuantity,
+      position: generateKeyBetween(lastPosition, null),
+    } as ListEntryDTO
+
+    const createTask = createListEntry(newEntry)
+
+    toast.promise(createTask, {
+      pending: 'Creating list entry...',
+      success: 'List entry created successfully!',
+      error: 'Failed to create list entry.',
+    })
+
+    const resultEntry = await createTask
+
+    if (resultEntry) {
+      addListEntry(parentId, resultEntry)
+      onClose()
+    } else {
+      toast.error('Failed to create list entry.')
+    }
+  }
+
+  const handleQueryChange = async (query: string) => {
+    setItemName(query)
+    setComboValue(undefined)
+    const incomingSuggestions = await getSuggestions(query)
+    console.log(
+      'Incoming suggestions: ',
+      incomingSuggestions.map((i) => i.itemName),
+    )
+    setSuggestions(incomingSuggestions)
+  }
+
+  const handleComboChange = (value: string | undefined) => {
+    if (value === undefined) {
+      setItemName('')
+      setComboValue(undefined)
+    } else {
+      const match = suggestions.find((s) => s.id === Number(value))
+      setItemName(match?.itemName ?? '')
+      setItemDescription(match?.itemDescription ?? '')
+      setComboValue(value)
+    }
+  }
+
+  return (
+    <BottomSheetModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Add List Item"
+      desktopMaxWidth="max-w-md"
+    >
+      <form onSubmit={handleCreate} className="flex flex-col gap-4">
+        <ComboBox
+          options={suggestions.map((s) => ({
+            label: s.itemName,
+            value: s.id.toString(),
+          }))}
+          value={comboValue}
+          onChange={handleComboChange}
+          onQueryChange={handleQueryChange}
+          displayValue={itemName}
+          placeholder="Enter item name"
+        />
+        <textarea
+          placeholder="Item description (Optional"
+          className="w-full p-2 border rounded"
+          value={itemDescription}
+          onChange={handleItemDescriptionChange}
+        />
+        <input
+          type="number"
+          placeholder="Quantity (Optional)"
+          className="w-full p-2 border rounded"
+          value={itemQuantity !== undefined ? itemQuantity : ''}
+          onChange={handleItemQuantityChange}
+          min={0}
+        />
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="w-full bg-destructive p-2 border border-border rounded hover:bg-muted transition-colors"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!itemName.trim()}
+            type="submit"
+            className="w-full p-2 bg-primary text-white rounded hover:bg-secondary transition-colors"
+          >
+            Create
+          </button>
+        </div>
+      </form>
+    </BottomSheetModal>
+  )
+}

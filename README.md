@@ -1,2 +1,5 @@
-# listo-tasklist
-Tasklist project, testing out Supabase integration and other libraries in React 19.
+# Listo
+
+> A simple task list app
+
+This is a simple task app used to practice supabase integration (and other packages) for React 19.
