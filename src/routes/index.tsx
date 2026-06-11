@@ -1,10 +1,10 @@
-import { getLists } from '#/api/lists'
 import { AddListButton } from '#/components/AddList/AddListButton'
 import { AddListPlusButton } from '#/components/AddList/AddListPlusButton'
 import { IndexHeader } from '#/components/Header/IndexHeader'
 import { Lists } from '#/components/Lists/Lists'
+import { useLists } from '#/stores/ListsStore'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Suspense, use } from 'react'
+import { Suspense } from 'react'
 
 export const Route = createFileRoute('/')({
   beforeLoad: ({ context }) => {
@@ -20,10 +20,8 @@ export const Route = createFileRoute('/')({
   component: Home,
 })
 
-const listsPromise = getLists()
-
 function Home() {
-  const lists = use(listsPromise)
+  const { lists } = useLists()
 
   return (
     <Suspense fallback={<div>Loading your lists...</div>}>
