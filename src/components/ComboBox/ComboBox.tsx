@@ -129,6 +129,7 @@ export const ComboBox = ({
           readOnly={!isOpen}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          autoComplete="off"
           aria-autocomplete="list"
           aria-controls={listboxId}
         />
