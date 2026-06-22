@@ -20,6 +20,7 @@ interface ComboBoxProps {
   placeholder?: string
   disabled?: boolean
   className?: string
+  autoFocus?: boolean
 }
 
 export const ComboBox = ({
@@ -31,6 +32,7 @@ export const ComboBox = ({
   placeholder = 'Search...',
   disabled = false,
   className,
+  autoFocus = false,
 }: ComboBoxProps) => {
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
@@ -79,6 +81,15 @@ export const ComboBox = ({
   }
 
   useEffect(() => {
+    if (!autoFocus) return
+    const timer = setTimeout(() => {
+      setIsOpen(true)
+      inputRef.current?.focus()
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         containerRef.current &&
@@ -108,6 +119,7 @@ export const ComboBox = ({
         )}
       >
         <input
+          aria-selected={true}
           ref={inputRef}
           type="text"
           className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm text-content placeholder:text-text/50 p-0"
@@ -140,7 +152,7 @@ export const ComboBox = ({
         )}
       </div>
 
-      {isOpen && (
+      {isOpen && (options.length > 0 || query.length > 0) && (
         <ul
           id={listboxId}
           role="listbox"

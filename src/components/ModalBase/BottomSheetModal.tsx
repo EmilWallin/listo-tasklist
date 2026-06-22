@@ -1,5 +1,5 @@
 import { XIcon } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 interface BottomSheetModalProps {
@@ -19,6 +19,28 @@ export default function BottomSheetModal({
   desktopMaxWidth = 'max-w-lg',
 }: BottomSheetModalProps) {
   const contentRef = useRef<HTMLDivElement>(null)
+  const [keyboardOffset, setKeyboardOffset] = useState(0)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setKeyboardOffset(0)
+      return
+    }
+    const vv = window.visualViewport
+    if (!vv) return
+    const update = () => {
+      setKeyboardOffset(
+        Math.max(0, window.innerHeight - vv.offsetTop - vv.height),
+      )
+    }
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    update()
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+    }
+  }, [isOpen])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,6 +65,7 @@ export default function BottomSheetModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'sheet-modal-title' : undefined}
+      style={{ paddingBottom: keyboardOffset }}
     >
       {/* Backdrop */}
       <div

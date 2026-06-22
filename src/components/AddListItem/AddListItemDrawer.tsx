@@ -50,7 +50,7 @@ export const AddListItemDrawer = ({
       .at(-1)?.position ?? null
 
   const handleItemDescriptionChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setItemDescription(e.target.value)
   }
@@ -87,7 +87,6 @@ export const AddListItemDrawer = ({
 
     toast.promise(createTask, {
       pending: 'Creating list entry...',
-      success: 'List entry created successfully!',
       error: 'Failed to create list entry.',
     })
 
@@ -142,9 +141,10 @@ export const AddListItemDrawer = ({
           onQueryChange={handleQueryChange}
           displayValue={itemName}
           placeholder="Enter item name"
+          autoFocus
         />
-        <textarea
-          placeholder="Item description (Optional"
+        <input
+          placeholder="Item description (Optional)"
           className="w-full p-2 border rounded"
           value={itemDescription}
           onChange={handleItemDescriptionChange}
