@@ -1,3 +1,4 @@
+import { ForceReloadButton } from '#/components/ForceReloadButton/ForceReloadButton'
 import { ListViewHeader } from '#/components/Header/ListViewHeader'
 import { ListView } from '#/components/List/ListView'
 import { useLists } from '#/stores/ListsStore'
@@ -24,7 +25,14 @@ function RouteComponent() {
     <div className="flex flex-col h-full w-full">
       <ListViewHeader list={list} />
       <div className="h-full w-full overflow-y-scroll">
-        {list ? <ListView list={list} /> : <div>List not found</div>}
+        {list ? (
+          <ListView list={list} />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full w-full gap-4">
+            <span>List not found</span>
+            <ForceReloadButton />
+          </div>
+        )}
       </div>
     </div>
   )
