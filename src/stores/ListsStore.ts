@@ -18,6 +18,8 @@ interface ListsState {
   updateListEntry: (listId: number, entry: ListEntry) => void
   deleteListEntry: (listId: number, entryId: number) => void
 
+  refresh: () => Promise<void>
+
   selectedListId: number | null
   setSelectedListId: (id: number | null) => void
 }
@@ -94,6 +96,10 @@ export const useLists = create<ListsState>((set) => ({
       onListEntryChange,
     })
     return unsubscribe
+  },
+  refresh: async () => {
+    const lists = await getLists()
+    set({ lists })
   },
   setLists: (lists) => set({ lists }),
   addList: (list) => set((state) => ({ lists: [...state.lists, list] })),
