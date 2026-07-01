@@ -95,6 +95,10 @@ export const ListView = ({ list }: ListProps) => {
   }
 
   const handleDeleteCompletedEntries = async () => {
+    const shouldDelete = window.confirm(
+      'Are you sure you want to delete all completed entries?',
+    )
+    if (!shouldDelete) return
     setIsLoading(true)
     const deletePromise = deleteAllListEntriesForList(list.id, true)
     toast.promise(deletePromise, {
