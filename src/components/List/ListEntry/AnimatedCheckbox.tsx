@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { cn } from '#/utils/cn'
 import { Check } from 'lucide-react'
 
@@ -21,12 +20,13 @@ export const AnimatedCheckbox = ({
       checked ? 'bg-primary border-primary' : 'bg-transparent border-border',
     )}
   >
-    <motion.span
-      initial={false}
-      animate={{ scale: checked ? 1 : 0, opacity: checked ? 1 : 0 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+    <span
+      className={cn(
+        'transition-[transform,opacity] duration-200 ease-out',
+        checked ? 'scale-100 opacity-100' : 'scale-0 opacity-0',
+      )}
     >
       <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
-    </motion.span>
+    </span>
   </button>
 )
