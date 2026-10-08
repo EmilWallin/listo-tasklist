@@ -1,4 +1,4 @@
-import type { ListEntry, ListEntryDTO } from '#/types/ListEntry'
+import type { ListEntryDTO } from '#/types/ListEntry'
 import { useEffect, useState } from 'react'
 import BottomSheetModal from '../ModalBase/BottomSheetModal'
 import { createListEntry, updateListEntry } from '#/api/listEntries'
