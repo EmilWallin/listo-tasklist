@@ -1,4 +1,4 @@
-import type { ListEntryDTO } from '#/types/ListEntry'
+import type { ListEntry, ListEntryDTO } from '#/types/ListEntry'
 import { useEffect, useState } from 'react'
 import BottomSheetModal from '../ModalBase/BottomSheetModal'
 import { createListEntry, updateListEntry } from '#/api/listEntries'
@@ -63,6 +63,30 @@ export const AddListItemDrawer = ({
     setItemQuantity(Number(value))
   }
 
+  const createCurrentTask = async (item?: Suggestion) => {
+    const newEntry = {
+      parent_id: parentId,
+      item_name: item?.itemName ?? itemName,
+      item_description: item?.itemDescription ?? itemDescription,
+      item_quantity: itemQuantity,
+      position: generateKeyBetween(lastPosition, null),
+    } as ListEntryDTO
+
+    const task = createListEntry(newEntry)
+    toast.promise(task, {
+      pending: 'Creating list entry...',
+      error: 'Failed to create list entry.',
+    })
+    const resultEntry = await task
+
+    if (resultEntry) {
+      addListEntry(parentId, resultEntry)
+      onClose()
+    } else {
+      toast.error('Failed to create list entry.')
+    }
+  }
+
   const handleCreate = async (e: React.SubmitEvent) => {
     e.preventDefault()
 
@@ -86,39 +110,13 @@ export const AddListItemDrawer = ({
       return
     }
 
-    const newEntry = {
-      parent_id: parentId,
-      item_name: itemName,
-      item_description: itemDescription,
-      item_quantity: itemQuantity,
-      position: generateKeyBetween(lastPosition, null),
-    } as ListEntryDTO
-
-    const createTask = createListEntry(newEntry)
-
-    toast.promise(createTask, {
-      pending: 'Creating list entry...',
-      error: 'Failed to create list entry.',
-    })
-
-    const resultEntry = await createTask
-
-    if (resultEntry) {
-      addListEntry(parentId, resultEntry)
-      onClose()
-    } else {
-      toast.error('Failed to create list entry.')
-    }
+    await createCurrentTask()
   }
 
   const handleQueryChange = async (query: string) => {
     setItemName(query)
     setComboValue(undefined)
     const incomingSuggestions = await getSuggestions(query)
-    console.log(
-      'Incoming suggestions: ',
-      incomingSuggestions.map((i) => i.itemName),
-    )
     setSuggestions(incomingSuggestions)
   }
 
@@ -132,6 +130,37 @@ export const AddListItemDrawer = ({
       setItemDescription(match?.itemDescription ?? '')
       setComboValue(value)
     }
+  }
+
+  const handleItemSelected = async (value: string | undefined) => {
+    if (value === undefined) return
+
+    const match = suggestions.find((s) => s.id === Number(value))
+    setItemName(match?.itemName ?? '')
+    setItemDescription(match?.itemDescription ?? '')
+    setComboValue(value)
+
+    const existingItem = currentList?.items.find(
+      (item) => item.itemName.toLowerCase() === itemName.trim().toLowerCase(),
+    )
+
+    if (existingItem) {
+      if (existingItem.completed) {
+        const updateTask = updateListEntry({
+          ...existingItem,
+          completed: false,
+        })
+        toast.promise(updateTask, {
+          pending: 'Updating list entry...',
+          error: 'Failed to update list entry.',
+        })
+        await updateTask
+      }
+      onClose()
+      return
+    }
+
+    await createCurrentTask(match)
   }
 
   return (
@@ -150,6 +179,7 @@ export const AddListItemDrawer = ({
           value={comboValue}
           onChange={handleComboChange}
           onQueryChange={handleQueryChange}
+          onItemSelected={handleItemSelected}
           displayValue={itemName}
           placeholder="Enter item name"
           autoFocus

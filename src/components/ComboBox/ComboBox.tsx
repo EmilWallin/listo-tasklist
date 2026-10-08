@@ -13,6 +13,8 @@ interface ComboBoxProps {
   value?: string
   /** Called when an option is selected or the clear button is pressed */
   onChange: (value: string | undefined) => void
+  /** Called when an option is selected */
+  onItemSelected?: (value: string | undefined) => void
   /** Called on every keystroke; use for async option fetching */
   onQueryChange?: (query: string) => void
   /** Text shown in the input when closed and no option is selected */
@@ -27,6 +29,7 @@ export const ComboBox = ({
   options,
   value,
   onChange,
+  onItemSelected,
   onQueryChange,
   displayValue,
   placeholder = 'Search...',
@@ -58,6 +61,7 @@ export const ComboBox = ({
 
   const handleSelect = (option: ComboBoxOption) => {
     onChange(option.value)
+    onItemSelected?.(option.value)
     setQuery('')
     setIsOpen(false)
   }
