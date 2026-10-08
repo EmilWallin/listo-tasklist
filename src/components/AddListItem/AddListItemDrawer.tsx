@@ -1,7 +1,7 @@
 import type { ListEntryDTO } from '#/types/ListEntry'
 import { useEffect, useState } from 'react'
 import BottomSheetModal from '../ModalBase/BottomSheetModal'
-import { createListEntry } from '#/api/listEntries'
+import { createListEntry, updateListEntry } from '#/api/listEntries'
 import { toast } from 'react-toastify'
 import { useLists } from '#/stores/ListsStore'
 import { generateKeyBetween } from 'jittered-fractional-indexing'
@@ -66,12 +66,23 @@ export const AddListItemDrawer = ({
   const handleCreate = async (e: React.SubmitEvent) => {
     e.preventDefault()
 
-    if (
-      currentList?.items.some(
-        (item) => item.itemName.toLowerCase() === itemName.trim().toLowerCase(),
-      )
-    ) {
-      toast.error('This item is already in the list.')
+    const existingItem = currentList?.items.find(
+      (item) => item.itemName.toLowerCase() === itemName.trim().toLowerCase(),
+    )
+
+    if (existingItem) {
+      if (existingItem.completed) {
+        const updateTask = updateListEntry({
+          ...existingItem,
+          completed: false,
+        })
+        toast.promise(updateTask, {
+          pending: 'Updating list entry...',
+          error: 'Failed to update list entry.',
+        })
+        await updateTask
+      }
+      onClose()
       return
     }
 
