@@ -37,8 +37,6 @@ const SuggestionsList = ({
       itemDescription: string
     } | null,
   ) => {
-    console.log('Drawer closed', isEdited, newItemInfo)
-
     setIsDrawerOpen(false)
     if (isEdited && newItemInfo) {
       setSuggestions((current) =>
