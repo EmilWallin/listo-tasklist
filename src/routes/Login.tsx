@@ -1,9 +1,7 @@
-import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { z } from 'zod'
 
-// 1. Define what query parameters this route expects.
-// This allows us to grab the '?redirect=/dashboard' part of the URL safely.
 const loginSearchSchema = z.object({
   redirect: z.string().optional(),
 })
@@ -15,7 +13,7 @@ export const Route = createFileRoute('/Login')({
 
 function LoginComponent() {
   const navigate = useNavigate()
-  const { supabase } = Route.useRouteContext() // Pull the supabase client from router context!
+  const { supabase } = Route.useRouteContext()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
