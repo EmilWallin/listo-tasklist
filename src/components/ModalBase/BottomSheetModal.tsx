@@ -110,7 +110,7 @@ export default function BottomSheetModal({
             </h2>
             <button
               onClick={onClose}
-              className="rounded-full border border-border p-1.5 text-text hover:bg-muted transition-colors"
+              className="rounded-full border border-border p-1.5 text-text hover:bg-secondary transition-colors"
               aria-label="Close"
             >
               <XIcon className="h-5 w-5" />

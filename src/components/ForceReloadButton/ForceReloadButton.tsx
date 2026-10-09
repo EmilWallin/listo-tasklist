@@ -18,7 +18,7 @@ export const ForceReloadButton = () => {
 
   return (
     <button
-      className="p-2 rounded-md hover:bg-gray-200"
+      className="p-2 rounded-md"
       disabled={isLoading}
       onClick={handleReload}
     >
